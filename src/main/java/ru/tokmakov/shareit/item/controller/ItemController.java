@@ -21,10 +21,10 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public Item create(@RequestBody @Valid ItemDto itemDto,
-                       @RequestHeader(X_SHARER_USER_ID) long userId) {
+    public Item save(@RequestBody @Valid ItemDto itemDto,
+                     @RequestHeader(X_SHARER_USER_ID) long userId) {
         log.info("ItemController: create is called");
-        Item item = itemService.create(itemDto, userId);
+        Item item = itemService.save(itemDto, userId);
         log.info("ItemController: item created successfully");
         return item;
     }
@@ -40,9 +40,9 @@ public class ItemController {
     }
 
     @GetMapping("{itemId}")
-    public ItemDto getById(@PathVariable long itemId) {
+    public ItemDto findById(@PathVariable long itemId) {
         log.info("ItemController: getById is called");
-        ItemDto itemDto = ItemMapper.itemToDto(itemService.getById(itemId));
+        ItemDto itemDto = ItemMapper.itemToDto(itemService.findById(itemId));
         log.info("ItemController: item received successfully");
         return itemDto;
     }

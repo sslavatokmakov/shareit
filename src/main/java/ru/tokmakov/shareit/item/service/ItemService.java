@@ -7,11 +7,11 @@ import ru.tokmakov.shareit.item.model.Item;
 import java.util.List;
 
 public interface ItemService {
-    Item create(ItemDto itemDto, long userId);
+    Item save(ItemDto itemDto, long userId);
 
     Item update(long itemId, UpdateItemDto itemDto, long userId);
 
-    Item getById(long itemId);
+    Item findById(long itemId);
 
     List<ItemDto> allItemsFromUser(long userId);
 

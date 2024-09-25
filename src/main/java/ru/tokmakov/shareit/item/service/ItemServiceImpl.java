@@ -13,67 +13,62 @@ import ru.tokmakov.shareit.user.model.User;
 import ru.tokmakov.shareit.user.service.UserService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final ItemRepository itemRepository;
-    private long id = 0;
 
     @Override
-    public Item create(ItemDto itemDto, long userId) {
-        User user = userService.getById(userId);
+    public Item save(ItemDto itemDto, long userId) {
+        User user = userService.findById(userId);
 
         Item item = ItemMapper.dtoToItem(itemDto);
-        item.setId(generateId());
         item.setOwner(user);
 
-        itemRepository.create(item);
-        return item;
+        return itemRepository.save(item);
     }
 
     @Override
     public Item update(long itemId, UpdateItemDto itemDto, long userId) {
-        Item item = itemRepository.getById(itemId)
+        Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("Item with id " + itemId + " not found"));
+
         if (item.getOwner().getId() != userId) {
             throw new AccessDeniedException("Access denied you didn't create this item");
         }
+
         updateItemDetails(item, itemDto);
-        return itemRepository.update(itemId, item);
+
+        return itemRepository.save(item);
     }
 
     private void updateItemDetails(Item item, UpdateItemDto itemDto) {
-        if (itemDto.getName() != null) {
-            item.setName(itemDto.getName());
-        }
-        if (itemDto.getDescription() != null) {
-            item.setDescription(itemDto.getDescription());
-        }
-        if (itemDto.getAvailable() != null) {
-            item.setAvailable(itemDto.getAvailable());
-        }
+        Optional.ofNullable(itemDto.getName()).ifPresent(item::setName);
+        Optional.ofNullable(itemDto.getDescription()).ifPresent(item::setDescription);
+        Optional.ofNullable(itemDto.getAvailable()).ifPresent(item::setAvailable);
     }
 
     @Override
-    public Item getById(long itemId) {
-        return itemRepository.getById(itemId)
+    public Item findById(long itemId) {
+        return itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("Item with id " + itemId + " not found"));
     }
 
     @Override
     public List<ItemDto> allItemsFromUser(long userId) {
-        userService.getById(userId);
+        userService.findById(userId);
         return itemRepository.allItemsFromUser(userId);
     }
 
     @Override
     public List<ItemDto> search(String text) {
-        return itemRepository.search(text);
-    }
+        if (text.isBlank()) {
+            return List.of();
+        }
 
-    private long generateId() {
-        return ++id;
+        return itemRepository.search(text.toLowerCase());
     }
 }

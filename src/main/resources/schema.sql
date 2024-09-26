@@ -14,6 +14,18 @@ CREATE TABLE IF NOT EXISTS items
     description VARCHAR(255),
     available   BOOLEAN,
     owner       INTEGER,
-    CONSTRAINT fk_owner
-        FOREIGN KEY (owner) REFERENCES users (id)
+    CONSTRAINT fk_owner FOREIGN KEY (owner) REFERENCES users (id)
+);
+
+CREATE TABLE IF NOT EXISTS bookings
+(
+    id     SERIAL PRIMARY KEY,
+    start_date_time  TIMESTAMP,
+    end_date_time  TIMESTAMP,
+    item   INTEGER,
+    booker iNTEGER,
+    status VARCHAR(20),
+
+    CONSTRAINT fk_item FOREIGN KEY (item) REFERENCES items (id),
+    CONSTRAINT fk_booker FOREIGN KEY (booker) REFERENCES users (id)
 );

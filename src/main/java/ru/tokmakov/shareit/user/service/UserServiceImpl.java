@@ -3,8 +3,8 @@ package ru.tokmakov.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.tokmakov.shareit.user.dto.UserDto;
-import ru.tokmakov.shareit.user.exception.EmailAlreadyExistException;
-import ru.tokmakov.shareit.user.exception.UserNotFoundException;
+import ru.tokmakov.shareit.exception.user.EmailAlreadyExistException;
+import ru.tokmakov.shareit.exception.user.UserNotFoundException;
 import ru.tokmakov.shareit.user.model.User;
 import ru.tokmakov.shareit.user.repository.UserRepository;
 

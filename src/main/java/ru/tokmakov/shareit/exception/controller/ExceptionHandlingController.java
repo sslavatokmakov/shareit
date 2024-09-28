@@ -11,6 +11,7 @@ import ru.tokmakov.shareit.exception.booking.BookingAccessDeniedException;
 import ru.tokmakov.shareit.exception.booking.BookingConflictException;
 import ru.tokmakov.shareit.exception.booking.BookingNotFoundException;
 import ru.tokmakov.shareit.exception.booking.InvalidBookingPeriodException;
+import ru.tokmakov.shareit.exception.item.ItemAccessDeniedException;
 import ru.tokmakov.shareit.exception.item.ItemNotFoundException;
 import ru.tokmakov.shareit.exception.item.ItemUnavailableException;
 import ru.tokmakov.shareit.exception.model.ErrorDetails;
@@ -28,8 +29,8 @@ public class ExceptionHandlingController {
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler({AccessDeniedException.class, BookingAccessDeniedException.class})
-    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e, WebRequest request) {
+    @ExceptionHandler({ItemAccessDeniedException.class, BookingAccessDeniedException.class})
+    public ResponseEntity<?> handleAccessDeniedException(ItemAccessDeniedException e, WebRequest request) {
         return handleException(e, HttpStatus.FORBIDDEN, request);
     }
 

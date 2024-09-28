@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.tokmakov.shareit.booking.model.Booking;
 import ru.tokmakov.shareit.booking.repository.BookingRepository;
+import ru.tokmakov.shareit.exception.item.ItemAccessDeniedException;
 import ru.tokmakov.shareit.exception.item.ItemUnavailableException;
 import ru.tokmakov.shareit.item.dto.*;
-import ru.tokmakov.shareit.item.exception.AccessDeniedException;
 import ru.tokmakov.shareit.exception.item.ItemNotFoundException;
 import ru.tokmakov.shareit.item.model.Comment;
 import ru.tokmakov.shareit.item.model.Item;
@@ -43,7 +43,7 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new ItemNotFoundException("Item with id " + itemId + " not found"));
 
         if (item.getOwner().getId() != userId) {
-            throw new AccessDeniedException("Access denied you didn't create this item");
+            throw new ItemAccessDeniedException("Access denied you didn't create this item");
         }
 
         updateItemDetails(item, itemDto);
@@ -88,15 +88,17 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new ItemNotFoundException("Item with id " + itemId + " not found"));
 
-        Booking bookingsByUser = bookingRepository.findByItemIdAndBookerIdAndEndBeforeNow(itemId, userId);
-        if (bookingsByUser == null) {
-            throw new ItemUnavailableException("Access denied you didn't create this item");
-        }
+        verifyBookingExists(itemId, userId);
 
         comment.setUser(user);
         comment.setItem(item);
         comment.setCreated(LocalDate.now());
 
         return CommentMapper.toCommentDto(commentRepository.save(comment));
+    }
+
+    private void verifyBookingExists(long itemId, long userId) {
+        bookingRepository.findByItemIdAndBookerIdAndEndBeforeNow(itemId, userId)
+                .orElseThrow(() -> new ItemUnavailableException("Access denied: you didn't create a booking for this item"));
     }
 }

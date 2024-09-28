@@ -29,25 +29,25 @@ public class ExceptionHandlingController {
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler({ItemAccessDeniedException.class, BookingAccessDeniedException.class})
-    public ResponseEntity<?> handleAccessDeniedException(ItemAccessDeniedException e, WebRequest request) {
+    public ResponseEntity<?> handleFORBIDDENExceptions(Exception e, WebRequest request) {
         return handleException(e, HttpStatus.FORBIDDEN, request);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({ItemUnavailableException.class, InvalidBookingPeriodException.class})
-    public ResponseEntity<?> handleItemUnavailableException(ItemUnavailableException e, WebRequest request) {
+    public ResponseEntity<?> handleBadRequestExceptions(Exception e, WebRequest request) {
         return handleException(e, HttpStatus.BAD_REQUEST, request);
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler({EmailAlreadyExistException.class, BookingConflictException.class})
-    public ResponseEntity<?> handleEmailAlreadyExistException(EmailAlreadyExistException e, WebRequest request) {
+    public ResponseEntity<?> handleConflictExceptions(Exception e, WebRequest request) {
         return handleException(e, HttpStatus.CONFLICT, request);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class, BookingNotFoundException.class})
-    public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException e, WebRequest request) {
+    public ResponseEntity<?> handleNotFoundExceptions(Exception e, WebRequest request) {
         return handleException(e, HttpStatus.NOT_FOUND, request);
     }
 }

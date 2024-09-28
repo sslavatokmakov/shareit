@@ -17,7 +17,6 @@ import ru.tokmakov.shareit.exception.item.ItemUnavailableException;
 import ru.tokmakov.shareit.exception.model.ErrorDetails;
 import ru.tokmakov.shareit.exception.user.EmailAlreadyExistException;
 import ru.tokmakov.shareit.exception.user.UserNotFoundException;
-import ru.tokmakov.shareit.item.exception.AccessDeniedException;
 
 @Slf4j
 @ControllerAdvice

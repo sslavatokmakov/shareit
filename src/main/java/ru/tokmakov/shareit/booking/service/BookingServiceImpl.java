@@ -11,12 +11,12 @@ import ru.tokmakov.shareit.booking.model.BookingState;
 import ru.tokmakov.shareit.exception.booking.BookingAccessDeniedException;
 import ru.tokmakov.shareit.exception.booking.BookingConflictException;
 import ru.tokmakov.shareit.exception.booking.InvalidBookingPeriodException;
+import ru.tokmakov.shareit.exception.item.ItemAccessDeniedException;
 import ru.tokmakov.shareit.exception.item.ItemUnavailableException;
 import ru.tokmakov.shareit.booking.model.Booking;
 import ru.tokmakov.shareit.booking.model.BookingStatus;
 import ru.tokmakov.shareit.booking.repository.BookingRepository;
 import ru.tokmakov.shareit.exception.booking.BookingNotFoundException;
-import ru.tokmakov.shareit.item.exception.AccessDeniedException;
 import ru.tokmakov.shareit.exception.item.ItemNotFoundException;
 import ru.tokmakov.shareit.item.model.Item;
 import ru.tokmakov.shareit.item.repository.ItemRepository;
@@ -78,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
                 () -> new BookingNotFoundException("Booking with id " + bookingId + " not found"));
 
         if (booking.getItem().getOwner().getId() != userId) {
-            throw new AccessDeniedException(
+            throw new ItemAccessDeniedException(
                     "User with id " + userId + " is not the owner of the item with id " + booking.getItem().getId());
         }
 

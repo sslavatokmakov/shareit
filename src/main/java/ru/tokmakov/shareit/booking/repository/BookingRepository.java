@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.tokmakov.shareit.booking.model.Booking;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -83,4 +84,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
            "WHERE b.item.owner.id = ?1 AND b.status = 'REJECTED' " +
            "ORDER BY b.start")
     List<Booking> findRejectedReservationsByUserId(long userId);
+
+    @Query("SELECT b " +
+           "FROM Booking b " +
+           "WHERE b.item.id = ?1 AND b.booker.id = ?2 AND b.end < CURRENT TIMESTAMP")
+    Booking findByItemIdAndBookerIdAndEndBeforeNow(long itemId, long bookerId);
+
+    @Query("SELECT COUNT(b) > 0 " +
+           "FROM Booking b " +
+           "WHERE b.item.id = ?1 AND b.start >= ?2 AND ?3 <= b.end")
+    Boolean existsByItemAndPeriod(long itemId, LocalDateTime start, LocalDateTime end);
 }

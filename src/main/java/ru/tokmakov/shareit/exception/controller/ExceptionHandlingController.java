@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import ru.tokmakov.shareit.exception.booking.BookingAccessDeniedException;
+import ru.tokmakov.shareit.exception.booking.BookingConflictException;
 import ru.tokmakov.shareit.exception.booking.BookingNotFoundException;
+import ru.tokmakov.shareit.exception.booking.InvalidBookingPeriodException;
+import ru.tokmakov.shareit.exception.item.ItemNotFoundException;
 import ru.tokmakov.shareit.exception.item.ItemUnavailableException;
 import ru.tokmakov.shareit.exception.model.ErrorDetails;
 import ru.tokmakov.shareit.exception.user.EmailAlreadyExistException;
@@ -67,4 +70,27 @@ public class ExceptionHandlingController {
         return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ItemNotFoundException.class)
+    public ResponseEntity<?> handleItemNotFoundException(ItemNotFoundException e, WebRequest request) {
+        log.error(e.getMessage(), e);
+        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(BookingConflictException.class)
+    public ResponseEntity<?> handleBookingConflictException(BookingConflictException e, WebRequest request) {
+        log.error(e.getMessage(), e);
+        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvalidBookingPeriodException.class)
+    public ResponseEntity<?> handleInvalidBookingPeriodException(InvalidBookingPeriodException e, WebRequest request) {
+        log.error(e.getMessage(), e);
+        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
 }

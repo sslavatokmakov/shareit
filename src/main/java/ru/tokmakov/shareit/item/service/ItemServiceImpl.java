@@ -2,16 +2,20 @@ package ru.tokmakov.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.tokmakov.shareit.item.dto.ItemDto;
-import ru.tokmakov.shareit.item.dto.ItemMapper;
-import ru.tokmakov.shareit.item.dto.UpdateItemDto;
+import ru.tokmakov.shareit.booking.model.Booking;
+import ru.tokmakov.shareit.booking.repository.BookingRepository;
+import ru.tokmakov.shareit.exception.item.ItemUnavailableException;
+import ru.tokmakov.shareit.item.dto.*;
 import ru.tokmakov.shareit.item.exception.AccessDeniedException;
-import ru.tokmakov.shareit.item.exception.ItemNotFoundException;
+import ru.tokmakov.shareit.exception.item.ItemNotFoundException;
+import ru.tokmakov.shareit.item.model.Comment;
 import ru.tokmakov.shareit.item.model.Item;
+import ru.tokmakov.shareit.item.repository.CommentRepository;
 import ru.tokmakov.shareit.item.repository.ItemRepository;
 import ru.tokmakov.shareit.user.model.User;
 import ru.tokmakov.shareit.user.service.UserService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +24,8 @@ import java.util.Optional;
 public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public Item save(ItemDto itemDto, long userId) {
@@ -52,13 +58,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item findById(long itemId) {
-        return itemRepository.findById(itemId)
+    public ItemWithCommentsDto findById(long itemId) {
+        ItemWithCommentsDto itemWithCommentsDto = itemRepository.findWithCommentsById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("Item with id " + itemId + " not found"));
+
+        itemWithCommentsDto.setComments(commentRepository.findByItemId(itemId));
+
+        return itemWithCommentsDto;
     }
 
     @Override
-    public List<ItemDto> allItemsFromUser(long userId) {
+    public List<ItemWithBookingDateDto> allItemsFromUser(long userId) {
         userService.findById(userId);
         return itemRepository.allItemsFromUser(userId);
     }
@@ -70,5 +80,23 @@ public class ItemServiceImpl implements ItemService {
         }
 
         return itemRepository.search(text.toLowerCase());
+    }
+
+    @Override
+    public CommentDto saveComment(Comment comment, long itemId, long userId) {
+        User user = userService.findById(userId);
+        Item item = itemRepository.findById(itemId).orElseThrow(
+                () -> new ItemNotFoundException("Item with id " + itemId + " not found"));
+
+        Booking bookingsByUser = bookingRepository.findByItemIdAndBookerIdAndEndBeforeNow(itemId, userId);
+        if (bookingsByUser == null) {
+            throw new ItemUnavailableException("Access denied you didn't create this item");
+        }
+
+        comment.setUser(user);
+        comment.setItem(item);
+        comment.setCreated(LocalDate.now());
+
+        return CommentMapper.toCommentDto(commentRepository.save(comment));
     }
 }

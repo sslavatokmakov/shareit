@@ -2,7 +2,6 @@ package ru.tokmakov.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.tokmakov.shareit.booking.model.Booking;
 import ru.tokmakov.shareit.booking.repository.BookingRepository;
 import ru.tokmakov.shareit.exception.item.ItemAccessDeniedException;
 import ru.tokmakov.shareit.exception.item.ItemUnavailableException;

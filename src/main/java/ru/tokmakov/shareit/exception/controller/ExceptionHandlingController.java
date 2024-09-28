@@ -21,76 +21,33 @@ import ru.tokmakov.shareit.item.exception.AccessDeniedException;
 @Slf4j
 @ControllerAdvice
 public class ExceptionHandlingController {
+    private ResponseEntity<ErrorDetails> handleException(Exception e, HttpStatus status, WebRequest request) {
+        log.error(e.getMessage(), e);
+        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, status);
+    }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(AccessDeniedException.class)
+    @ExceptionHandler({AccessDeniedException.class, BookingAccessDeniedException.class})
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e, WebRequest request) {
-        log.error(e.getMessage(), e);
-        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
+        return handleException(e, HttpStatus.FORBIDDEN, request);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ItemUnavailableException.class)
+    @ExceptionHandler({ItemUnavailableException.class, InvalidBookingPeriodException.class})
     public ResponseEntity<?> handleItemUnavailableException(ItemUnavailableException e, WebRequest request) {
-        log.error(e.getMessage(), e);
-        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(BookingNotFoundException.class)
-    public ResponseEntity<?> handleBookingNotFoundException(BookingNotFoundException e, WebRequest request) {
-        log.error(e.getMessage(), e);
-        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+        return handleException(e, HttpStatus.BAD_REQUEST, request);
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(EmailAlreadyExistException.class)
+    @ExceptionHandler({EmailAlreadyExistException.class, BookingConflictException.class})
     public ResponseEntity<?> handleEmailAlreadyExistException(EmailAlreadyExistException e, WebRequest request) {
-        log.error(e.getMessage(), e);
-        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+        return handleException(e, HttpStatus.CONFLICT, request);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class, BookingNotFoundException.class})
     public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException e, WebRequest request) {
-        log.error(e.getMessage(), e);
-        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-    }
-
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(BookingAccessDeniedException.class)
-    public ResponseEntity<?> handleBookingAccessDeniedException(BookingAccessDeniedException e, WebRequest request) {
-        log.error(e.getMessage(), e);
-        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ItemNotFoundException.class)
-    public ResponseEntity<?> handleItemNotFoundException(ItemNotFoundException e, WebRequest request) {
-        log.error(e.getMessage(), e);
-        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(BookingConflictException.class)
-    public ResponseEntity<?> handleBookingConflictException(BookingConflictException e, WebRequest request) {
-        log.error(e.getMessage(), e);
-        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidBookingPeriodException.class)
-    public ResponseEntity<?> handleInvalidBookingPeriodException(InvalidBookingPeriodException e, WebRequest request) {
-        log.error(e.getMessage(), e);
-        ErrorDetails errorDetails = new ErrorDetails(e.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        return handleException(e, HttpStatus.NOT_FOUND, request);
     }
 }

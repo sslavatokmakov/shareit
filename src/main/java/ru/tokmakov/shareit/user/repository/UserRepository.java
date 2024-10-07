@@ -1,19 +1,14 @@
 package ru.tokmakov.shareit.user.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import ru.tokmakov.shareit.user.model.User;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
-public interface UserRepository {
-    User create(User user);
-
-    Optional<User> getById(long userId);
-
-    List<User> getAll();
-
-    void deleteById(long userId, User user);
-
-    Set<String> getEmails();
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    @Query("SELECT DISTINCT u.email FROM User u")
+    Set<String> findDistinctEmails();
 }

@@ -1,76 +1,110 @@
 package ru.tokmakov.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.tokmakov.shareit.user.dto.UserDto;
-import ru.tokmakov.shareit.user.exception.EmailAlreadyExistException;
-import ru.tokmakov.shareit.user.exception.UserNotFoundException;
+import ru.tokmakov.shareit.exception.user.EmailAlreadyExistException;
+import ru.tokmakov.shareit.exception.user.UserNotFoundException;
 import ru.tokmakov.shareit.user.model.User;
 import ru.tokmakov.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private long id = 0;
 
     @Override
-    public User create(User user) {
-        if (isEmailExist(user.getEmail()))
+    @Transactional
+    public User save(User user) {
+        log.info("UserServiceImpl: attempting to save user with email: {}", user.getEmail());
+        if (isEmailExist(user.getEmail())) {
+            log.warn("UserServiceImpl: email already exists: {}", user.getEmail());
             throw new EmailAlreadyExistException("Email: " + user.getEmail() + " already exist");
-        user.setId(generateId());
-        return userRepository.create(user);
+        }
+        User savedUser = userRepository.save(user);
+        log.info("UserServiceImpl: user saved successfully with email: {}", savedUser.getEmail());
+        return savedUser;
     }
 
     @Override
-    public User getById(long userId) {
-        return userRepository.getById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
-    }
+    @Transactional(readOnly = true)
+    public User findById(long userId) {
+        log.info("UserServiceImpl: attempting to find user with id: {}", userId);
 
-    @Override
-    public List<User> getAll() {
-        return userRepository.getAll();
-    }
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            log.warn("UserServiceImpl: user not found with id: {}", userId);
+            return new UserNotFoundException("User with id " + userId + " not found");
+        });
 
-    @Override
-    public User update(long userId, UserDto userDto) {
-        User user = userRepository.getById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
-
-        if (userDto.getEmail() != null && isEmailExist(userDto.getEmail())) {
-            throw new EmailAlreadyExistException("Email: " + userDto.getEmail() + " already exist");
-        }
-        User updatedUser = updateUserDetails(user, userDto);
-        userRepository.deleteById(userId, user);
-
-        return userRepository.create(updatedUser);
-    }
-
-    private User updateUserDetails(User user, UserDto userDto) {
-        if (userDto.getName() != null) {
-            user.setName(userDto.getName());
-        }
-        if (userDto.getEmail() != null) {
-            user.setEmail(userDto.getEmail());
-        }
+        log.info("UserServiceImpl: successfully found user with id: {}", userId);
         return user;
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<User> findAll() {
+        log.info("UserServiceImpl: attempting to retrieve all users");
+        List<User> users = userRepository.findAll();
+
+        log.info("UserServiceImpl: retrieved {} users", users.size());
+        return users;
+    }
+
+    @Override
+    @Transactional
+    public User update(long userId, UserDto userDto) {
+        log.info("UserServiceImpl: attempting to update user with id: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("UserServiceImpl: user not found with id: {}", userId);
+                    return new UserNotFoundException("User with id " + userId + " not found");
+                });
+
+        log.info("UserServiceImpl: validating email for user with id: {}", userId);
+        validateEmail(userDto.getEmail());
+
+        log.info("UserServiceImpl: updating details for user with id: {}", userId);
+        updateUserDetails(user, userDto);
+
+        User updatedUser = userRepository.save(user);
+        log.info("UserServiceImpl: successfully updated user with id: {}", userId);
+
+        return updatedUser;
+    }
+
+    private void validateEmail(String email) {
+        if (email != null && isEmailExist(email)) {
+            throw new EmailAlreadyExistException("Email: " + email + " already exist");
+        }
+    }
+
+    private void updateUserDetails(User user, UserDto userDto) {
+        Optional.ofNullable(userDto.getName()).ifPresent(user::setName);
+        Optional.ofNullable(userDto.getEmail()).ifPresent(user::setEmail);
+    }
+
+    @Override
+    @Transactional
     public void deleteById(long userId) {
-        User user = userRepository.getById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
-        userRepository.deleteById(userId, user);
+        log.info("UserServiceImpl: attempting to delete user with id: {}", userId);
+
+        userRepository.findById(userId).orElseThrow(() -> {
+            log.warn("UserServiceImpl: user not found with id: {}", userId);
+            return new UserNotFoundException("User with id " + userId + " not found");
+        });
+
+        userRepository.deleteById(userId);
+        log.info("UserServiceImpl: successfully deleted user with id: {}", userId);
     }
 
     private boolean isEmailExist(String email) {
-        return userRepository.getEmails().contains(email);
-    }
-
-    private long generateId() {
-        return ++id;
+        return userRepository.findDistinctEmails().contains(email);
     }
 }

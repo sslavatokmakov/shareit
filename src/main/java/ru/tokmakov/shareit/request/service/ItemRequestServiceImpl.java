@@ -3,6 +3,7 @@ package ru.tokmakov.shareit.request.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.tokmakov.shareit.exception.request.ItemRequestNotFoundException;
 import ru.tokmakov.shareit.exception.user.UserNotFoundException;
 import ru.tokmakov.shareit.item.model.Item;
@@ -27,6 +28,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public ItemRequest save(ItemRequest itemRequest, long userId) {
         log.info("ItemRequestService: save is called by userId={}", userId);
 
@@ -50,6 +52,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRequestDto> findByUserId(long userId) {
         log.info("ItemRequestService: findByUserId is called by userId={}", userId);
 
@@ -86,6 +89,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRequest> findAll(long userId) {
         log.info("ItemRequestService: findAll is called by userId={}", userId);
 
@@ -108,6 +112,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemRequestDto findById(long requestId) {
         log.info("ItemRequestService: findById is called with requestId={}", requestId);
 

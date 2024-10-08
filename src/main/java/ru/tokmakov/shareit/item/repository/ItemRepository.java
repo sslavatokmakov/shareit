@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    @Query("SELECT new ru.tokmakov.shareit.item.dto.ItemDto(i.id, i.name, i.description, i.available) " +
+    @Query("SELECT new ru.tokmakov.shareit.item.dto.ItemDto(i.id, i.name, i.description, i.available, i.requestId) " +
            "FROM Item i " +
            "WHERE (LOWER(i.name) LIKE LOWER(CONCAT('%', ?1, '%')) " +
            "OR LOWER(i.description) LIKE LOWER(CONCAT('%', ?1, '%'))) " +

@@ -15,6 +15,7 @@ import ru.tokmakov.shareit.exception.item.ItemAccessDeniedException;
 import ru.tokmakov.shareit.exception.item.ItemNotFoundException;
 import ru.tokmakov.shareit.exception.item.ItemUnavailableException;
 import ru.tokmakov.shareit.exception.model.ErrorDetails;
+import ru.tokmakov.shareit.exception.request.ItemRequestNotFoundException;
 import ru.tokmakov.shareit.exception.user.EmailAlreadyExistException;
 import ru.tokmakov.shareit.exception.user.UserNotFoundException;
 
@@ -46,7 +47,7 @@ public class ExceptionHandlingController {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class, BookingNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class, BookingNotFoundException.class, ItemRequestNotFoundException.class})
     public ResponseEntity<?> handleNotFoundExceptions(Exception e, WebRequest request) {
         return handleException(e, HttpStatus.NOT_FOUND, request);
     }

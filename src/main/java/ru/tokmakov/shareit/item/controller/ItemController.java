@@ -66,5 +66,4 @@ public class ItemController {
         log.info("ItemController: comment saved successfully with commentId = {}", savedComment.getId());
         return savedComment;
     }
-
 }

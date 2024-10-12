@@ -1,6 +1,7 @@
 package ru.tokmakov.shareit.booking.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.tokmakov.shareit.item.model.Item;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "bookings")
+@AllArgsConstructor
 @NoArgsConstructor
 public class Booking {
     @Id

@@ -1,5 +1,6 @@
 package ru.tokmakov.shareit.item.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,5 +16,6 @@ public class CommentDto {
     private String text;
     private String authorName;
     private Item item;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate created;
 }

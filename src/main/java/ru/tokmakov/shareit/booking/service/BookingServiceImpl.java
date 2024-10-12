@@ -25,7 +25,6 @@ import ru.tokmakov.shareit.user.model.User;
 import ru.tokmakov.shareit.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -107,7 +106,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
         log.info("BookingServiceImpl: updated booking with id: {} to status: {}", bookingId, booking.getStatus());
 
-        Booking updatedBooking = bookingRepository.save(booking); // Assuming save method is necessary for persistence
+        Booking updatedBooking = bookingRepository.save(booking);
         log.info("BookingServiceImpl: successfully responded to booking request with id: {} with approval status: {}", bookingId, approved);
 
         return updatedBooking;
@@ -208,11 +207,10 @@ public class BookingServiceImpl implements BookingService {
             }
         };
 
-        return Optional.ofNullable(bookings)
-                .filter(list -> !list.isEmpty())
-                .orElseThrow(() -> {
-                    log.warn("BookingServiceImpl: no reservations found for user with id: {}", userId);
-                    return new BookingNotFoundException("No reservations found for user " + userId);
-                });
+        if (bookings == null || bookings.isEmpty()) {
+            log.warn("BookingServiceImpl: no reservations found for user with id: {}", userId);
+            throw new BookingNotFoundException("No reservations found for user " + userId);
+        }
+        return bookings;
     }
 }

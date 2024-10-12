@@ -91,6 +91,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT COUNT(b) > 0 " +
            "FROM Booking b " +
-           "WHERE b.item.id = ?1 AND b.start >= ?2 AND ?3 <= b.end")
+           "WHERE b.item.id = ?1 AND " +
+           "(b.start < ?3 AND b.end > ?2)")
     Boolean existsByItemAndPeriod(long itemId, LocalDateTime start, LocalDateTime end);
 }

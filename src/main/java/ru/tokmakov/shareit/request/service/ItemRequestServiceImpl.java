@@ -104,10 +104,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         log.info("ItemRequestService: Found {} item requests for users other than userId={}", itemRequests.size(), userId);
 
-        if (itemRequests.isEmpty()) {
-            log.info("ItemRequestService: No item requests found for users other than userId={}", userId);
-        }
-
         return itemRequests;
     }
 
